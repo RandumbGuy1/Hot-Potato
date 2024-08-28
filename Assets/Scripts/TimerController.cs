@@ -11,7 +11,7 @@ public class TimerController : MonoBehaviour
     {
         if (Input.GetKeyDown(passKey))
         {
-
+            timer.Finish();
         }
     }
 }
