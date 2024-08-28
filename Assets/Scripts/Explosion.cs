@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
+    [SerializeField] GameObject crater;
+    [SerializeField] AudioClip explosionSound;
+    [SerializeField] CameraShaker shaker;
     [SerializeField] ParticleSystem explosion;
     [SerializeField] LayerMask CollidesWith;
     [SerializeField] ForceMode forceMode;
@@ -14,6 +17,10 @@ public class Explosion : MonoBehaviour
     public void Explode()
     {
         explosion.Play();
+        shaker.ShakeOnce(new PerlinShake(ShakeData.Create(20f, 10f, 1.5f, 5f)));
+        crater.SetActive(true);
+        AudioManager.Instance.PlayOnce(explosionSound, transform.position);
+
         Collider[] enemiesInRadius = Physics.OverlapSphere(transform.position, explosionRadius, CollidesWith);
 
         for (int i = 0; i < enemiesInRadius.Length; i++)

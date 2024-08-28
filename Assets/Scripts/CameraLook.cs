@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraLook : MonoBehaviour
 {
     [SerializeField] Transform pivot;
+    [SerializeField] CameraShaker shaker;
 
     [Header("Look Settings")]
     [SerializeField] [Range(0, 1)] float sensitivity;
@@ -36,10 +37,8 @@ public class CameraLook : MonoBehaviour
         LockCursorState(true);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //rawRotation = Vector3.Slerp(rawRotation, Vector3.zero, Time.deltaTime * smoothSpeed * 0.1f);
         rawRotation += new Vector3(-Input.GetAxisRaw("Mouse Y"), Input.GetAxisRaw("Mouse X"), 0) * sensitivity;
         rawRotation.x = Mathf.Clamp(rawRotation.x, negativeClamp.x, positiveClamp.x);
         rawRotation.y = Mathf.Clamp(rawRotation.y, negativeClamp.y, positiveClamp.y);
@@ -47,7 +46,7 @@ public class CameraLook : MonoBehaviour
         smoothRotation = Vector3.Slerp(smoothRotation, rawRotation, Time.deltaTime * smoothSpeed);
         swayOffset = Vector3.Slerp(swayOffset, GetSwayOffset(swayAmplitude, swayFrequency), Time.deltaTime * swayAmplitude);
 
-        pivot.rotation = Quaternion.Euler(startEulerAngles + smoothRotation + swayOffset);
+        pivot.rotation = Quaternion.Euler(startEulerAngles + smoothRotation + swayOffset + shaker.Offset);
     }
 
     public Vector3 GetSwayOffset(float amplitude, float frequency)

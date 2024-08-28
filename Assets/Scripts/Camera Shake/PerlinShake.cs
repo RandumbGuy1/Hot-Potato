@@ -40,7 +40,6 @@ public class PerlinShake : IShakeEvent
         noise.y = OctaveNoise(noiseOffset.y, 2f);
         noise.z = OctaveNoise(noiseOffset.z, 3f);
 
-        //noise = (noise - Vector3.one * 0.5f) * 2f;
         noise *= shakeData.Magnitude;
         noise *= trama;
 
