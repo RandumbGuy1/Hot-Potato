@@ -14,6 +14,7 @@ public class SliderTimer : MonoBehaviour
     [SerializeField] UnityEvent onTimerComplete;
     [SerializeField] UnityEvent onTimerReset;
     [SerializeField] int turn = 0;
+    public int Turn => turn;
 
     bool resetting = false;
     float resetSpeedRatio = 1;
@@ -63,6 +64,8 @@ public class SliderTimer : MonoBehaviour
 
     public void Finish()
     {
+        if (resetting) return;
+
         resetting = true;
         tickingSource.Stop();
         speedLines.Stop();
