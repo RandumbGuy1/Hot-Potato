@@ -13,9 +13,12 @@ public class SliderTimer : MonoBehaviour
     [SerializeField] Gradient colorGradient;
     [SerializeField] UnityEvent onTimerComplete;
     [SerializeField] UnityEvent onTimerReset;
+    [SerializeField] Vector2 fovChange;
     [SerializeField] int turn = 0;
     public int Turn => turn;
+    public bool GameEnded => gameEnded;
 
+    bool gameEnded = false;
     bool resetting = false;
     float resetSpeedRatio = 1;
     float timerSpeedMulti = 1f;
@@ -31,11 +34,11 @@ public class SliderTimer : MonoBehaviour
     }
     void Update()
     {
-        if (resetting) slider.value = Mathf.Max(0f, slider.value - Time.deltaTime * resetSpeedRatio * 0.5f);
-        else slider.value = Mathf.Min(1f, slider.value + Time.deltaTime * timerSpeed * timerSpeedMulti * 0.1f);
+        if (resetting) slider.value = Mathf.Max(0f, slider.value - Time.deltaTime * resetSpeedRatio * 0.75f * (gameEnded ? 3f : 1f));
+        else if (!gameEnded) slider.value = Mathf.Min(1f, slider.value + Time.deltaTime * timerSpeed * timerSpeedMulti * 0.1f);
 
         tickingSource.pitch = Mathf.Lerp(0.5f, 1f, EaseIn(slider.value));
-        cam.fieldOfView = Mathf.Lerp(90f, 75f, EaseIn(slider.value));
+        cam.fieldOfView = Mathf.Lerp(fovChange.x, fovChange.y, EaseIn(slider.value));
 
         ParticleSystem.EmissionModule em = speedLines.emission;
         em.rateOverTime = Mathf.Lerp(0f, 400f, EaseIn(slider.value));
@@ -43,7 +46,11 @@ public class SliderTimer : MonoBehaviour
         ParticleSystem.VelocityOverLifetimeModule velOverLife = speedLines.velocityOverLifetime;
         velOverLife.speedModifier = Mathf.Lerp(0.5f, 3f, EaseIn(slider.value));
 
-        if (slider.value >= 1f && lastSliderValue < 1f) onTimerComplete?.Invoke();
+        if (slider.value >= 1f && lastSliderValue < 1f)
+        {
+            onTimerComplete?.Invoke();
+            resetSpeedRatio *= 0.25f;
+        }
         if (slider.value <= 0f && lastSliderValue > 0f) onTimerReset?.Invoke();
 
         fill.color = colorGradient.Evaluate(slider.value);
@@ -52,6 +59,8 @@ public class SliderTimer : MonoBehaviour
 
     void DisableReset()
     {
+        if (gameEnded) return;
+
         speedLines.Play();
         tickingSource.Play();
         resetting = false;
@@ -72,5 +81,9 @@ public class SliderTimer : MonoBehaviour
         turn++;
         timerSpeedMulti = 1f + (turn * 0.1f);
         resetSpeedRatio = slider.value;
+    }
+    public void EndGame()
+    {
+        gameEnded = true;
     }
 }

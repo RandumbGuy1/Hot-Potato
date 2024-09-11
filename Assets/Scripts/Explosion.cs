@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
+    [SerializeField] int chipAmount;
+    [SerializeField] GameObject chipDebris;
     [SerializeField] GameObject crater;
     [SerializeField] AudioClip explosionSound;
     [SerializeField] CameraShaker shaker;
@@ -20,6 +22,8 @@ public class Explosion : MonoBehaviour
         shaker.ShakeOnce(new PerlinShake(ShakeData.Create(20f, 10f, 1.5f, 5f)));
         crater.SetActive(true);
         AudioManager.Instance.PlayOnce(explosionSound, transform.position);
+
+        for (int i = 0; i < chipAmount; i++) ObjectPooler.Instance.Spawn("Chips", transform.position + Random.insideUnitSphere, Quaternion.identity);
 
         Collider[] enemiesInRadius = Physics.OverlapSphere(transform.position, explosionRadius, CollidesWith);
 

@@ -32,22 +32,16 @@ public class TimerController : MonoBehaviour
         players[index].SetActive(false);
         players.RemoveAt(index);
 
-        index = timer.Turn % players.Count;
-
-        if (players.Count <= 1)
-        {
-            Configure();
-            timer.enabled = false;
-            text.text = players[index].name + " Wins!";
-        }
+        if (players.Count <= 1) timer.EndGame();
     }
 
     public void Configure()
     {
         if (players.Count == 0) return;
 
-        int index = timer.Turn % players.Count;
+        int index = timer.Turn % players.Count;       
+
         for (int i = 0; i < players.Count; i++) players[i].SetActive(i == index);
-        text.text = players[index].name;
+        text.text = players[index].name + (timer.GameEnded ? " Wins!" : "");
     }
 }
